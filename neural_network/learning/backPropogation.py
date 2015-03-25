@@ -17,3 +17,5 @@ class BackPropogationLearning:
             print(val)
     
 
+
+
