@@ -10,5 +10,10 @@ class BackPropogationLearning:
         self.network = network
         
 
-    def train(input, outputs):
+    def train(self, inputs, outputs):
         # TODO
+        for i in range(len(inputs)):
+            val = self.network.calculate(inputs[i])
+            print(val)
+    
+
