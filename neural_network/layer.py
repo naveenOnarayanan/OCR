@@ -11,8 +11,10 @@ class Layer:
         self.outputs = []
 
         (layer1, layer2) = self.layer_struct
-        self.weights = np.random.normal(scale=0.1, size=(layer2, layer1+1))
+        # self.weights = np.random.normal(scale=0.1, size=(layer2, layer1+1))
 
+        self.weights = np.empty((layer2, layer1+1))
+        self.weights.fill(0.2)
 
         print(self.layer_struct)
         print(self.weights)
@@ -22,7 +24,7 @@ class Layer:
         inputs = np.append(inputs, -1)
         print("Weight: ", self.weights, "Input: ", inputs)
         
-        return self.matrix_dot(self.weights, inputs)
+        return self.function.eval(self.matrix_dot(self.weights, inputs))
 
     def matrix_dot(self, arr1, arr2):
         #Rotate second arr for matrix multiplication
