@@ -1,7 +1,8 @@
 import cv2
 import numpy
 import os
-
+import neural_network.neural as neural
+import random
 
 def cleardir(dir):
     for file in os.listdir(dir):
@@ -120,8 +121,9 @@ def charSeparationFromLines(lines):
 
 
 def bufferCharImages(chars):
-    charImages = []
+    lineCharImages = []
     for i in range(len(chars)):
+        charImages = []
         mkdir('images/debug/bufferedcharacters/' + str(i))
         cleardir('images/debug/bufferedcharacters/' + str(i))
         for j in range(len(chars[i])):
@@ -135,7 +137,8 @@ def bufferCharImages(chars):
             fileName = 'images/debug/bufferedcharacters/' + str(i) + '/' + str(j) + '.png'
             cv2.imwrite(fileName, charImage)
             charImages.append(charImage)
-    return charImages
+        lineCharImages.append(charImages)
+    return lineCharImages
 
 def main():
     mkdir('images/debug/')
@@ -172,6 +175,39 @@ def main():
     
     
     bufferedCharacters = bufferCharImages(characters)
+    
+    
+    
+    
+    test = neural.Neural(bufferedCharacters)
+    test.train()
+    
+    
+    
+    
+    
+   
+    
+    
+    
+    #image = cv2.imread('images/test/1.png', 0)
+    #binaryImage = binarization(image)
+    #lines = lineSeparation(binaryImage)
+    #characters = charSeparationFromLines(lines)
+    #bufferedCharacters = bufferCharImages(characters)
+    
+    # noise
+    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
+    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
+    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
+    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
+    
+    #cv2.imshow('noise', bufferedCharacters[0][5])
+    #cv2.waitKey(0)
+    
+    #for i in range(len(bufferedCharacters[0])):
+    retval = test.run(bufferedCharacters[0][5])
+    print retval
     
 
 if __name__ == '__main__':
