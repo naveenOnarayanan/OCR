@@ -152,30 +152,30 @@ def main():
     cleardir('images/debug/bufferedcharacters/')
 
 
-    # read and grey scale image
-    image = cv2.imread('images/training/num.png', 0)
-    cv2.imwrite('images/debug/grey.png', image)
-    #cv2.imshow('greyscale', grey)
-    #cv2.waitKey(0)
+    # # read and grey scale image
+    # image = cv2.imread('images/training/num.png', 0)
+    # cv2.imwrite('images/debug/grey.png', image)
+    # #cv2.imshow('greyscale', grey)
+    # #cv2.waitKey(0)
 
 
-    # binarize the image
-    binaryImage = binarization(image)
+    # # binarize the image
+    # binaryImage = binarization(image)
 
 
-    # process image by skewing it if enough time and needed
-    # ????????
+    # # process image by skewing it if enough time and needed
+    # # ????????
 
 
-    # line separation
-    lines = lineSeparation(binaryImage)
+    # # line separation
+    # lines = lineSeparation(binaryImage)
 
 
-    # character separation
-    characters = charSeparationFromLines(lines)
+    # # character separation
+    # characters = charSeparationFromLines(lines)
 
 
-    bufferedCharacters = bufferCharImages(characters)
+    # bufferedCharacters = bufferCharImages(characters)
 
 
 
@@ -195,7 +195,7 @@ def main():
 
 
 
-    image = cv2.imread('images/test/1.png', 0)
+    image = cv2.imread('images/test/2.png', 0)
     binaryImage = binarization(image)
     lines = lineSeparation(binaryImage)
     characters = charSeparationFromLines(lines)
@@ -214,7 +214,8 @@ def main():
             #retval = test.run(bufferedCharacters[0][i])
             #print retval
             retval = test2.run(bufferedCharacters[i][j])
-            print retval
+            print retval,
+        print ''
 
 if __name__ == '__main__':
     main()
