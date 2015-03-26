@@ -12,10 +12,10 @@ class Layer:
         self.inputs = []
 
         (layer1, layer2) = self.layer_struct
-        # self.weights = np.random.normal(scale=0.1, size=(layer2, layer1+1))
+        self.weights = np.random.normal(scale=0.1, size=(layer2, layer1+1))
 
-        self.weights = np.empty((layer2, layer1+1))
-        self.weights.fill(0.2)
+        # self.weights = np.empty((layer2, layer1+1))
+        # self.weights.fill(0.2)
 
         #print(self.layer_struct)
         #print(self.weights)

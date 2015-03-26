@@ -4,7 +4,7 @@ class BackPropogationLearning:
     def __init__(self, network):
         random.seed(1)
         self.learning_rate = 0.2
-        self.E_max = 0.01
+        self.E_max = 0.001
         self.E = float("inf")
         self.k = 1
         self.network = network
@@ -20,11 +20,23 @@ class BackPropogationLearning:
             for i in range(len(inputs)):
                 val = self.network.calculate(inputs[i])
                 self.E = 0.5*(outputs[i] - val)**2 + self.E
+                print("Error", self.E)
                 delta = self.network.function.derivative(val)*(outputs[i] - val)
                 self.propogate_error(delta)
 
         print("Training took " + str(iterations) + " iterations")
         print(val, outputs[0])
+
+    def run(self, inputs):
+        outputs = []
+        for i in range(len(inputs)):
+            outputs.append(self.network.calculate(inputs[i]))
+
+        print(outputs)
+
+
+
+
 
             
     def propogate_error(self, output_delta):
