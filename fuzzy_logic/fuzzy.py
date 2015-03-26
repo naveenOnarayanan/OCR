@@ -3,11 +3,14 @@ import math
 
 F_VHI = 1.0
 F_HIG = 0.8
-F_MHI = 0.75
 F_MED = 0.5
-F_MLO = 0.35
 F_LOW = 0.2
 F_VLO = 0
+
+
+def closest_fv(value):
+    vals = [F_VLO, F_LOW, F_MED, F_HIG, F_VHI]
+    return min(vals, key=lambda x:abs(x-value))
 
 
 def generalized_bell(x, a, b, c):
@@ -34,19 +37,23 @@ def symmetry(character):
 
 
 def width(character):
-    min_index = sys.maxint
-    max_index = -sys.maxint - 1
+    rows = 0
+    rsum = 0
 
     for i, row in enumerate(character):
+        rows += 1
+        max_row_w = 0
         row_width = 0
         for j, pixel in enumerate(row):
             if pixel == 0:
-                if j < min_index:
-                    min_index = j
-                elif j > max_index:
-                    max_index = j
+                row_width += 1
+                if row_width > max_row_w:
+                    max_row_w = row_width
+            else:
+                row_width = 0
+        rsum += max_row_w
 
-    return max_index - min_index
+    return rsum / float(rows)
 
 
 def density(character):
@@ -67,23 +74,22 @@ def center(character):
     center_w = len(character[0]) / 2
     center_h = len(character) / 2
 
-    print center_w, center_h
     return character[center_h][center_w] == 0
 
 
 def fuzzy_symmetry(sym):
-    # TODO
-    return sym
+    result = generalized_bell(sym, 0.2, 1, 1)
+    return closest_fv(result)
 
 
 def fuzzy_width(wid):
-    # TODO
-    return wid
+    result = generalized_bell(wid, 1, 1, 6)
+    return closest_fv(result)
 
 
 def fuzzy_density(den):
-    # TODO
-    return den
+    result = generalized_bell(den, 0.3, 1, 0.85)
+    return closest_fv(result)
 
 
 def fuzzify(character):
@@ -100,26 +106,27 @@ def fuzzify(character):
 
 
 def defuzzify(sym, den, wid, cen):
-    if sym == F_HIG and den == F_HIG and width == F_MED:
+    print sym, den, wid, cen
+    if sym == F_HIG and den == F_HIG and wid == F_VHI:
         if cen:
             return 8
         else:
             return 0
-    if sym == F_HIG and den == F_LOW and width == F_LOW:
+    if sym == F_HIG and den == F_LOW and wid == F_LOW:
         return 1
-    if sym == F_MED and den == F_MED and width == F_HIG:
+    if sym == F_MED and den == F_MED and wid == F_HIG:
         return 2
-    if sym == F_LOW and den == F_MED and width == F_MED:
+    if sym == F_LOW and den == F_MED and wid == F_MED:
         return 3
-    if sym == F_LOW and den == F_LOW and width == F_HIG:
+    if sym == F_LOW and den == F_LOW and wid == F_HIG:
         return 4
-    if sym == F_MED and den == F_MED and width == F_MED:
+    if sym == F_MED and den == F_MED and wid == F_MED:
         return 5
-    if sym == F_MED and den == F_HIG and width == F_MHI:
+    if sym == F_MED and den == F_HIG and wid == F_HIG:
         return 6
-    if sym == F_LOW and den == F_LOW and width == F_MHI:
+    if sym == F_MED and den == F_MED and wid == F_LOW:
         return 7
-    if sym == F_MED and den == F_HIG and width == F_MHI:
+    if sym == F_MED and den == F_HIG and wid == F_HIG:
         return 9
 
 
@@ -150,7 +157,7 @@ def main():
         [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
     ]
 
-    # print defuzzify(fuzzify(character))
+    print defuzzify(*fuzzify(character))
 
 
 if __name__ == '__main__':
