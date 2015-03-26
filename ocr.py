@@ -116,15 +116,36 @@ def charSeparationFromLines(lines):
             cv2.imwrite(fileName, charImages[j])
     
     return lineCharacters
-    
+
+
+
+def bufferCharImages(chars):
+    charImages = []
+    for i in range(len(chars)):
+        mkdir('images/debug/bufferedcharacters/' + str(i))
+        cleardir('images/debug/bufferedcharacters/' + str(i))
+        for j in range(len(chars[i])):
+            charImage = numpy.zeros((26, 18))
+            for k in range(26):
+                for l in range(18):
+                    if k < len(chars[i][j]) and l < len(chars[i][j][k]):
+                        charImage[k][l] = chars[i][j][k][l]
+                    else:
+                        charImage[k][l] = 255
+            fileName = 'images/debug/bufferedcharacters/' + str(i) + '/' + str(j) + '.png'
+            cv2.imwrite(fileName, charImage)
+            charImages.append(charImage)
+    return charImages
 
 def main():
     mkdir('images/debug/')
     mkdir('images/debug/lines/')
     mkdir('images/debug/characters/')
+    mkdir('images/debug/bufferedcharacters/')
     cleardir('images/debug/')
     cleardir('images/debug/lines/')
     cleardir('images/debug/characters/')
+    cleardir('images/debug/bufferedcharacters/')
     
     
     # read and grey scale image
@@ -148,6 +169,9 @@ def main():
     
     # character separation
     characters = charSeparationFromLines(lines)
+    
+    
+    bufferedCharacters = bufferCharImages(characters)
     
 
 if __name__ == '__main__':
