@@ -55,8 +55,8 @@ def lineSeparation(image):
                 lineStart = i
         else:
             if rowBlackCount[i] == 0:
-                if whiteLineCount < 3:
-                    whiteLineCount = whiteLineCount + 100
+                if whiteLineCount < 2:
+                    whiteLineCount = whiteLineCount + 1
                 else:
                     foundLine = False
                     lineEnd = i - 1
@@ -86,7 +86,6 @@ def charSeparation(line):
     
     foundChar = False
     charStart = 0
-    whiteColCount = 0
     charImages = []
     for i in range(len(columnBlackCount)):
         if foundChar == False:
@@ -95,17 +94,13 @@ def charSeparation(line):
                 charStart = i
         else:
             if columnBlackCount[i] == 0:
-                if whiteColCount < 3:
-                    whiteColCount = whiteColCount + 100
-                else:
-                    foundChar = False
-                    charEnd = i - 1
-                    charImage = numpy.zeros((len(line), charEnd - charStart))
-                    for j in range(len(line)):
-                        for k in range(charEnd - charStart):
-                            charImage[j][k] = line[j][k + charStart]
-                    charImages.append(charImage)
-                    whiteColCount = 0
+                foundChar = False
+                charEnd = i
+                charImage = numpy.zeros((len(line), charEnd - charStart))
+                for j in range(len(line)):
+                    for k in range(charEnd - charStart):
+                        charImage[j][k] = line[j][k + charStart]
+                charImages.append(charImage)
     return charImages
 
 
@@ -133,7 +128,7 @@ def main():
     
     
     # read and grey scale image
-    image = cv2.imread('images/num/num.png', 0)
+    image = cv2.imread('images/training/num.png', 0)
     cv2.imwrite('images/debug/grey.png', image)
     #cv2.imshow('greyscale', grey)
     #cv2.waitKey(0)
