@@ -3,6 +3,7 @@ import numpy
 import os
 import neural_network.neural as neural
 import random
+import pickle
 
 def cleardir(dir):
     for file in os.listdir(dir):
@@ -22,17 +23,17 @@ def mkdir(dir):
 def binarization(image):
     # gaussian blur the image to decrease noise
     blur = cv2.GaussianBlur(image, (3,3), 0)
-    
+
     # perform otsu's method to create black and white image
     ret, otsu = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
     cv2.imwrite('images/debug/blur.png', blur)
     cv2.imwrite('images/debug/otsu.png', otsu)
-    
+
     #cv2.imshow('gaussian', blur)
     #cv2.imshow('otsu', otsu)
     #cv2.waitKey(0)
-    
+
     return otsu
 
 
@@ -44,7 +45,7 @@ def lineSeparation(image):
             if (image[i][j] == 0):
                 blackCount = blackCount + 1
         rowBlackCount.append(blackCount)
-    
+
     foundLine = False
     lineStart = 0
     whiteLineCount = 0
@@ -64,11 +65,11 @@ def lineSeparation(image):
                     lineImage = image[lineStart:lineEnd]
                     lineImages.append(lineImage)
                     whiteLineCount = 0
-    
+
     for i in range(len(lineImages)):
         fileName = 'images/debug/lines/' + str(i) + '.png'
         cv2.imwrite(fileName, lineImages[i])
-    
+
     return lineImages
 
 
@@ -76,7 +77,7 @@ def charSeparation(line):
     if len(line) < 1:
         return
     width = len(line[0])
-    
+
     columnBlackCount = []
     for i in range(width):
         blackCount = 0
@@ -84,7 +85,7 @@ def charSeparation(line):
             if (line[j][i] == 0):
                 blackCount = blackCount + 1
         columnBlackCount.append(blackCount)
-    
+
     foundChar = False
     charStart = 0
     charImages = []
@@ -115,7 +116,7 @@ def charSeparationFromLines(lines):
         for j in range(len(charImages)):
             fileName = 'images/debug/characters/' + str(i) + '/' + str(j) + '.png'
             cv2.imwrite(fileName, charImages[j])
-    
+
     return lineCharacters
 
 
@@ -149,66 +150,71 @@ def main():
     cleardir('images/debug/lines/')
     cleardir('images/debug/characters/')
     cleardir('images/debug/bufferedcharacters/')
-    
-    
+
+
     # read and grey scale image
     image = cv2.imread('images/training/num.png', 0)
     cv2.imwrite('images/debug/grey.png', image)
     #cv2.imshow('greyscale', grey)
     #cv2.waitKey(0)
-    
-    
+
+
     # binarize the image
     binaryImage = binarization(image)
-    
-    
+
+
     # process image by skewing it if enough time and needed
     # ????????
-    
-    
+
+
     # line separation
     lines = lineSeparation(binaryImage)
-    
-    
+
+
     # character separation
     characters = charSeparationFromLines(lines)
-    
-    
+
+
     bufferedCharacters = bufferCharImages(characters)
-    
-    
-    
-    
-    test = neural.Neural(bufferedCharacters)
-    test.train()
-    
-    
-    
-    
-    
-   
-    
-    
-    
-    #image = cv2.imread('images/test/1.png', 0)
-    #binaryImage = binarization(image)
-    #lines = lineSeparation(binaryImage)
-    #characters = charSeparationFromLines(lines)
-    #bufferedCharacters = bufferCharImages(characters)
-    
-    # noise
-    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
-    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
-    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
-    bufferedCharacters[0][5][random.randint(0, 26)][random.randint(0, 17)] = 0
-    
-    #cv2.imshow('noise', bufferedCharacters[0][5])
-    #cv2.waitKey(0)
-    
-    #for i in range(len(bufferedCharacters[0])):
-    retval = test.run(bufferedCharacters[0][5])
-    print retval
-    
+
+
+
+
+    #test = neural.Neural(bufferedCharacters)
+    #test.train()
+
+
+    #with open('test.txt', 'wb') as f:
+    #    pickle.dump(test, f)
+
+    with open('MLPWeights', 'rb') as f:
+        test2 = pickle.load(f)
+
+
+
+
+
+
+    image = cv2.imread('images/test/1.png', 0)
+    binaryImage = binarization(image)
+    lines = lineSeparation(binaryImage)
+    characters = charSeparationFromLines(lines)
+    bufferedCharacters = bufferCharImages(characters)
+
+    for i in range(len(bufferedCharacters)):
+        for j in range(len(bufferedCharacters[i])):
+            # noise
+            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
+            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
+            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
+            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
+            #cv2.imshow('noise', bufferedCharacters[i][j])
+            #cv2.waitKey(0)
+
+            #retval = test.run(bufferedCharacters[0][i])
+            #print retval
+            retval = test2.run(bufferedCharacters[i][j])
+            print retval
 
 if __name__ == '__main__':
     main()

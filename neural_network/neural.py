@@ -8,7 +8,7 @@ class Neural:
 
     def __init__(self, data):
         self.data = data
-        self.learning = []
+        self.bpls = []
 
 
     def norm_and_flatten(self, mat):
@@ -16,43 +16,39 @@ class Neural:
         mat_arr = (mat_arr / 255) - 0.5
         return np.array([mat_arr])
 
-
-
     def train(self):
-        desired = []
-        inputs = []
+        test1 = self.data[0][0]
+        test2 = self.norm_and_flatten(test1)
+        patternSize = test2.shape[1]
+
         for i in range(len(self.data[0])):
-            for j in range(len(self.data)):
-                mat = self.data[j][i]
-                inputs.append(self.norm_and_flatten(mat))
-
-            #print("Input", inputs, len(inputs))
-
-            patternSize = inputs[0].shape[1]
-            desired = np.array([0.9]*patternSize)
-            
-            net = network.Network(functions.SigmoidFunction(1), patternSize, (patternSize, patternSize, patternSize, 1))
-            self.learning.append(learning.BackPropogationLearning(net))
-            
-            self.learning[-1].train(inputs, desired)
-            
+            neuralNetwork = network.Network(functions.SigmoidFunction(1), patternSize, (patternSize, patternSize, patternSize, 1))
+            bpl = learning.BackPropogationLearning(neuralNetwork)
             inputs = []
-            desired = []
-            
-            
+            outputs = []
+            for j in range(len(self.data)):
+                for k in range(len(self.data[j])):
+                    charMatrix = self.data[j][k]
+                    charArray = self.norm_and_flatten(charMatrix)
+                    inputs.append(charArray)
+                    if k == i:
+                        output = [0.9]
+                    else:
+                        output = 0.1
+                    outputs.append(output)
+
+            bpl.train(inputs, outputs)
+            print 'Done Training: ' + str(i)
+            self.bpls.append(bpl)
+
+
     def run(self, char):
-        outputs = []
-        mat = self.norm_and_flatten(char)
-        for i in range(len(self.learning)):
-            output = self.learning[i].run(mat)
-            outputs.append(math.fabs(0.9 - output[0]))
-        
-        
-        minIndex = -1
-        minValue = 1
-        for i in range(len(outputs)):
-            if outputs[i] < minValue:
-                minIndex = i
-                minValue = outputs[i]
-        
-        return minIndex
+        charArr = self.norm_and_flatten(char)
+        maxIndex = None
+        maxResult = 0
+        for i in range(len(self.bpls)):
+            result = self.bpls[i].run(charArr)
+            if result > maxResult:
+                maxIndex = i
+                maxResult = result
+        return maxIndex
