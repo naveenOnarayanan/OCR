@@ -2,6 +2,7 @@ import cv2
 import numpy
 import os
 import neural_network.neural as neural
+import fuzzy_logic.fuzzy as fuzzy
 import random
 import pickle
 
@@ -152,30 +153,30 @@ def main():
     cleardir('images/debug/bufferedcharacters/')
 
 
-    # # read and grey scale image
-    # image = cv2.imread('images/training/num.png', 0)
-    # cv2.imwrite('images/debug/grey.png', image)
-    # #cv2.imshow('greyscale', grey)
-    # #cv2.waitKey(0)
+    # read and grey scale image
+    image = cv2.imread('images/training/num.png', 0)
+    cv2.imwrite('images/debug/grey.png', image)
+    #cv2.imshow('greyscale', grey)
+    #cv2.waitKey(0)
 
 
-    # # binarize the image
-    # binaryImage = binarization(image)
+    # binarize the image
+    binaryImage = binarization(image)
 
 
-    # # process image by skewing it if enough time and needed
-    # # ????????
+    # process image by skewing it if enough time and needed
+    # ????????
 
 
-    # # line separation
-    # lines = lineSeparation(binaryImage)
+    # line separation
+    lines = lineSeparation(binaryImage)
 
 
-    # # character separation
-    # characters = charSeparationFromLines(lines)
+    # character separation
+    characters = charSeparationFromLines(lines)
 
 
-    # bufferedCharacters = bufferCharImages(characters)
+    bufferedCharacters = bufferCharImages(characters)
 
 
 
@@ -188,7 +189,7 @@ def main():
     #    pickle.dump(test, f)
 
     with open('MLPWeights', 'rb') as f:
-        test2 = pickle.load(f)
+        neuralSystem = pickle.load(f)
 
 
 
@@ -202,6 +203,8 @@ def main():
     bufferedCharacters = bufferCharImages(characters)
 
     for i in range(len(bufferedCharacters)):
+        fuzzyCount = 0
+        neuralCount = 0
         for j in range(len(bufferedCharacters[i])):
             # noise
             #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
@@ -211,11 +214,29 @@ def main():
             #cv2.imshow('noise', bufferedCharacters[i][j])
             #cv2.waitKey(0)
 
-            #retval = test.run(bufferedCharacters[0][i])
-            #print retval
-            retval = test2.run(bufferedCharacters[i][j])
-            print retval,
-        print ''
+            fuzzySystem = fuzzy.Fuzzy(characters[i][j])
+            result = fuzzySystem.run(characters[i][j])
+            if result == j:
+                fuzzyCount += 1
+
+            result = neuralSystem.run(bufferedCharacters[i][j])
+            if result == j:
+                neuralCount += 1
+
+        print len(bufferedCharacters[i]), fuzzyCount, neuralCount
+
+    # count = 0
+    # for i in range(10):
+    #     print str(i), ':',
+    #     for j in range(9):
+    #         test = fuzzy.Fuzzy(characters[j][i])
+    #         res = test.run(characters[j][i])
+    #         print res,
+    #         if res == i:
+    #             count += 1
+    #     print ''
+
+    # print count * 1.0 / 90
 
 if __name__ == '__main__':
     main()
