@@ -45,12 +45,15 @@ class Fuzzy:
         bot_count = 0
         height = len(character)
 
+        top_size = math.floor(height/float(2))
+        bot_size = math.ceil(height/float(2))
+
         for i, row in enumerate(character):
             for j, pixel in enumerate(row):
                 if pixel == 0:
-                    if i < height / 2:
+                    if i <= top_size:
                         top_count += 1
-                    else:
+                    elif i >= bot_size:
                         bot_count += 1
 
         return top_count / float(bot_count)
@@ -110,8 +113,12 @@ class Fuzzy:
         return character[center_h][center_w] == 0
 
 
-    def fuzzy_symmetry(self, sym):
+    def fuzzy_hor_symmetry(self, sym):
         result = self.generalized_bell(sym, 0.3, 1.7, 1.2)
+        return self.closest_fv(result)
+
+    def fuzzy_ver_symmetry(self, sym):
+        result = self.generalized_bell(sym, 1, 3, 1)
         return self.closest_fv(result)
 
 
@@ -169,18 +176,124 @@ class Fuzzy:
             return 9
 
     def center_piece(self, char):
-        count = 0
-        width = len(char[0])
-        for i, row in enumerate(char):
-            for j, pixel in enumerate(row):
-                if i >= 12 and i <= 15:
-                    if j >= 8 and j <= 10:
-                        if pixel == 0:
-                            count += 1
-        return count
+        blackCount = 0
+        charWidth = len(char[0])
+        measureWidth = charWidth / 3
+        charHeight = len(char)
+        measureHeight = charHeight / 3
+        for i in range(measureHeight, 2*measureHeight):
+            for j in range(measureWidth, 2*measureWidth):
+                if char[i][j] == 0:
+                    blackCount += 1
+        pixelCount = (charWidth - 2*measureWidth) * (charHeight - 2*measureHeight)
+        blackPercentage = 1.0 * blackCount / pixelCount
+        # print("%.2f" % blackPercentage),
+        return blackPercentage
+
+    def top_left(self, char):
+        blackCount = 0
+        charWidth = len(char[0])
+        measureWidth = charWidth / 3
+        charHeight = len(char)
+        measureHeight = charHeight / 3
+
+        for i in range(0, measureHeight):
+            for j in range(0, measureWidth):
+                if char[i][j] == 0:
+                    blackCount += 1
+        pixelCount = (charWidth - 2*measureWidth) * (charHeight - 2*measureHeight)
+        blackPercentage = 1.0 * blackCount / pixelCount
+        # print("%.2f" % blackPercentage),
+        return blackPercentage
+
+    def top_right(self, char):
+        blackCount = 0
+        charWidth = len(char[0])
+        measureWidth = charWidth / 3
+        charHeight = len(char)
+        measureHeight = charHeight / 3
+
+        for i in range(0, measureHeight):
+            for j in range(2*measureWidth, charWidth):
+                if char[i][j] == 0:
+                    blackCount += 1
+        pixelCount = (charWidth - 2*measureWidth) * (charHeight - 2*measureHeight)
+        blackPercentage = 1.0 * blackCount / pixelCount
+        # print("%.2f" % blackPercentage),
+        return blackPercentage
+
+    def bot_left(self, char):
+        blackCount = 0
+        charWidth = len(char[0])
+        measureWidth = charWidth / 3
+        charHeight = len(char)
+        measureHeight = charHeight / 3
+
+        for i in range(measureHeight*2, charHeight):
+            for j in range(0, measureWidth):
+                if char[i][j] == 0:
+                    blackCount += 1
+        pixelCount = (charWidth - 2*measureWidth) * (charHeight - 2*measureHeight)
+        blackPercentage = 1.0 * blackCount / pixelCount
+        # print("%.2f" % blackPercentage),
+        return blackPercentage
+
+    def bot_right(self, char):
+        blackCount = 0
+        charWidth = len(char[0])
+        measureWidth = charWidth / 3
+        charHeight = len(char)
+        measureHeight = charHeight / 3
+
+        for i in range(measureHeight*2, charHeight):
+            for j in range(2*measureWidth, charWidth):
+                if char[i][j] == 0:
+                    blackCount += 1
+        pixelCount = (charWidth - 2*measureWidth) * (charHeight - 2*measureHeight)
+        blackPercentage = 1.0 * blackCount / pixelCount
+        # print("%.2f" % blackPercentage),
+        return blackPercentage
+
+    def btw(self, x, left, right):
+        if x >= left and x <= right:
+            return True
+        return False
 
     def run(self, char):
+        a = self.top_left(char)
+        b = self.top_right(char)
+        c = self.center_piece(char)
+        d = self.bot_left(char)
+        e = self.bot_right(char)
+
+        if c < 0.1 and self.btw(a, 0.25, 0.65) and self.btw(b, 0.25, 0.65) and self.btw(d, 0.25, 0.65) and self.btw(e, 0.25, 0.65):
+            return 0
+        elif c > 0.2 and self.btw(a, 0.25, 0.7) and self.btw(b, 0.25, 0.7) and self.btw(d, 0.25, 0.7) and self.btw(e, 0.25, 0.7) and self.btw(self.fuzzy_hor_symmetry(self.horizontal_symmetry(char)), 0.8, 1.0) and self.btw(self.fuzzy_density(self.density(char)), 1, 1.0):
+            return 8
+        elif c > 0.4 and self.btw(a, 0.1, 0.4) and self.btw(d, 0, 0.4) and self.btw(e, 0.25, 1):
+            return 1
+        elif self.btw(c, 0, 0.5) and self.btw(b, 0.45, 0.65) and self.btw(a, 0.15, 0.55) and self.btw(self.fuzzy_hor_symmetry(self.horizontal_symmetry(char)), 0.8, 1) and self.btw(e, 0.2, 0.75):
+            return 2
+        elif self.btw(c, 0.1, 0.4) and self.btw(a, 0.1, 0.5) and self.btw(self.fuzzy_hor_symmetry(self.horizontal_symmetry(char)), 0, 0.2):
+            return 3
+        elif self.btw(c, 0.2, 0.5) and self.btw(a, 0, 0.1):
+            return 4
+        elif self.btw(c, 0.15, 0.35) and self.btw(b, 0.15, 0.45) and self.btw(a, 0.1, 0.6) and self.btw(d, 0.2, 0.55) and self.btw(e, 0.35, 0.65): # fixme!
+            return 5
+        elif self.btw(c, 0.2, 0.4) and self.btw(e, 0.35, 0.65) and self.horizontal_symmetry(char) > 1:
+            return 6
+        elif self.btw(e, 0, 0.15):
+            return 7
+        else:
+            return 9
+
+
+
         # print self.fuzzy_center_width(self.center_width(char))
-        print self.center_piece(char),
+        #print self.center_piece(char),
+        # self.top_left(char),
+        # self.top_right(char),
+        # self.bot_left(char),
+        # self.center_piece(char),
 
         # print self.defuzzify(*self.fuzzify(char)),
