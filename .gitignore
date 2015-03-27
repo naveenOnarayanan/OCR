@@ -1,2 +1,3 @@
 images/debug
 *.pyc
+.DS_Store
