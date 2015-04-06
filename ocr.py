@@ -143,6 +143,7 @@ def bufferCharImages(chars):
     return lineCharImages
 
 def main():
+    # clean up debug images
     mkdir('images/debug/')
     mkdir('images/debug/lines/')
     mkdir('images/debug/characters/')
@@ -152,68 +153,51 @@ def main():
     cleardir('images/debug/characters/')
     cleardir('images/debug/bufferedcharacters/')
 
-
     # read and grey scale image
     image = cv2.imread('images/training/num.png', 0)
     cv2.imwrite('images/debug/grey.png', image)
     #cv2.imshow('greyscale', grey)
     #cv2.waitKey(0)
 
-
     # binarize the image
     binaryImage = binarization(image)
-
 
     # process image by skewing it if enough time and needed
     # ????????
 
-
     # line separation
     lines = lineSeparation(binaryImage)
-
 
     # character separation
     characters = charSeparationFromLines(lines)
 
-
+    # buffer the image with white space if it is too small
     bufferedCharacters = bufferCharImages(characters)
 
+    # create a new neural network
+    #newNetwork = neural.Neural(bufferedCharacters)
+    #newNetwork.train()
 
+    # dump the neural network
+    #with open('MLPWeights', 'wb') as f:
+    #    pickle.dump(newNetwork, f)
 
-
-    #test = neural.Neural(bufferedCharacters)
-    #test.train()
-
-
-    #with open('test.txt', 'wb') as f:
-    #    pickle.dump(test, f)
-
+    # read the previously dumped neural network
     with open('MLPWeights', 'rb') as f:
         neuralSystem = pickle.load(f)
 
-
-
-
-
-
+    # load and preprocess the test images
     image = cv2.imread('images/test/2.png', 0)
     binaryImage = binarization(image)
     lines = lineSeparation(binaryImage)
     characters = charSeparationFromLines(lines)
     bufferedCharacters = bufferCharImages(characters)
 
+    # go through each character and check if they match
     for i in range(len(bufferedCharacters)):
         fuzzyCount = 0
         neuralCount = 0
         for j in range(len(bufferedCharacters[i])):
-            # noise
-            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
-            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
-            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
-            #bufferedCharacters[0][i][random.randint(0, 25)][random.randint(0, 16)] = 0
-            #cv2.imshow('noise', bufferedCharacters[i][j])
-            #cv2.waitKey(0)
-
             fuzzySystem = fuzzy.Fuzzy(characters[i][j])
             result = fuzzySystem.run(characters[i][j])
             if result == j:
@@ -224,19 +208,6 @@ def main():
                 neuralCount += 1
 
         print len(bufferedCharacters[i]), fuzzyCount, neuralCount
-
-    # count = 0
-    # for i in range(10):
-    #     print str(i), ':',
-    #     for j in range(9):
-    #         test = fuzzy.Fuzzy(characters[j][i])
-    #         res = test.run(characters[j][i])
-    #         print res,
-    #         if res == i:
-    #             count += 1
-    #     print ''
-
-    # print count * 1.0 / 90
 
 if __name__ == '__main__':
     main()

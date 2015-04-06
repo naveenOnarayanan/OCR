@@ -11,7 +11,6 @@ class BackPropogationLearning:
 
 
     def train(self, inputs, outputs):
-        # TODO
         iterations = 0
         val = 0
         while (self.E > self.E_max):
@@ -60,15 +59,6 @@ class BackPropogationLearning:
             dd = self.network.layers[i].weights * d
             # print("Delta_2", dd*delta[-1])
             delta.append(dd*delta[-1])
-
-
-            # inputs = self.network.layers[i].inputs
-            # if (inputs.shape(1) > delta[-1].shape(1)):
-            #     delta[-1]
-            # d = self.network.function.derivative() *
-            # delta.append(self.network.function.derivative(self.network.layers[i].inputs))
-
-            # print("Final Weights",self.network.layers[i].weights)
 
         return
 

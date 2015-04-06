@@ -1,6 +1,5 @@
 import learning.backPropogation
 import layer
-import neuron
 
 class Network:
     def __init__(self, function, input_count, shape):
@@ -12,9 +11,6 @@ class Network:
 
         for i in range(len(self.layer_struct)):
         	self.layers.append(layer.Layer(function, input_count, self.layer_struct[i]))
-
-   #      for i in range(len(shape)):
-			# self.layer[i] = layer.Layer(function, input_count, shape[i])
 
     def calculate(self, inputs):
     	output = inputs
