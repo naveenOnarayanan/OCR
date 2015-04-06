@@ -13,7 +13,7 @@ class Neural:
 
     def norm_and_flatten(self, mat):
         mat_arr = mat.flatten()
-        mat_arr = (mat_arr / 255) - 0.5
+        mat_arr = (mat_arr / 255)
         return np.array([mat_arr])
 
     def train(self):
@@ -22,7 +22,7 @@ class Neural:
         patternSize = test2.shape[1]
 
         for i in range(len(self.data[0])):
-            neuralNetwork = network.Network(functions.SigmoidFunction(1), patternSize, (patternSize, patternSize, patternSize, 1))
+            neuralNetwork = network.Network(functions.SigmoidFunction(1), patternSize, (patternSize, patternSize, 1))
             bpl = learning.BackPropogationLearning(neuralNetwork)
             inputs = []
             outputs = []
@@ -32,9 +32,9 @@ class Neural:
                     charArray = self.norm_and_flatten(charMatrix)
                     inputs.append(charArray)
                     if k == i:
-                        output = [0.9]
+                        output = [1]
                     else:
-                        output = 0.1
+                        output = 0
                     outputs.append(output)
 
             bpl.train(inputs, outputs)
